@@ -1,1 +1,4 @@
-videos/
+Videos/*.*
+Audio/*.*
+src/*.mp4
+src/*.mp3
