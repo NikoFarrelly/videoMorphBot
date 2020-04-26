@@ -1,11 +1,16 @@
 import moviepy.editor as mpe 
 import moviepy.video.fx.all as vfx
+from moviepy.editor import * 
 import os
 import random
 import datetime
 from pathlib import Path
 
 import time
+
+CURRENT_DIR = os.path.dirname(__file__)
+AUDIO_PATH = Path("../Audio/")
+VIDEO_PATH = Path("../Videos/")
 
 def getVideoFromClip(videoPath):
 	videoArray = os.listdir(videoPath)
@@ -74,53 +79,125 @@ def fadeOutEffect(video, duration):
 	return vfx.fadeout(video, duration)
 
 def applyVideoEffect(video):
-	index = getRandomNumber(len(videoEffects)-1)
-	return videoEffects[index](video)
+	index = getRandomNumber(len(VIDEO_EFFECTS)-1)
+	VIDEO_EFFECTS_USED.append(VIDEO_EFFECTS[index].__name__)
+	return VIDEO_EFFECTS[index](video)
 
 def getRandomNumber(num):
 	return random.randint(0, num)
 
+def deepFryEffect(video):
+	return vfx.lum_contrast(video.volumex(2000), 50, 10)
 
-videoEffects = [
-				speedEffectGenerate, playBackwardsEffect, flipClipHorizontallyEffect,
- 				flipClipVerticallyEffect,blackAndWhiteEffect, contrastLuminosityGenerate,
- 				gammaCorrectionGenerate, fadeInGenerate, fadeOutGenerate
- 			   ]
-
-def createRandomVideo(amountOfClips, index):
-	videoPath = Path("../Videos/")
-
+def loopClipEffect(video):
+	videoLength = video.end
+	if (video.end == 0):
+		return video
+	index = random.randrange(0, videoLength)
+	indexStep = random.uniform(0.5, 1)
 	count = 0
-	videos = []
-	while count != amountOfClips:
-		print('loop')
-		videos.append(getVideoFromClip(videoPath))
-		count += 1
-	# Splice clips together
-	videoClips = mpe.concatenate_videoclips(videos, method="compose")
-	videoClips.write_videofile("videoMash" + str(index) + ".mp4", threads=100)
+	clippedVideo = []
+	while int(count) != videoLength:
+		clippedVideo.append(video.subclip(index, index + indexStep))
+		count += indexStep
+	mergedClips = mpe.concatenate_videoclips(clippedVideo, method="compose")
+	return mergedClips
 
 
-	# Add video effects 
-	numOfEffects = videoClips.end
+def addVideoEffects(videoClips, index, numOfEffects): 
 	count = 0
 	while count != numOfEffects:
 		# grab part of video
 		randomStart = random.randint(0, int(videoClips.end))
 		randomEnd = random.randint(randomStart, int(videoClips.end))
-		print('loop2', randomStart, randomEnd)
+
 		videoClip = videoClips.subclip(t_start=randomStart, t_end=randomEnd)
 		# apply effect to video
 		modifiedClip = applyVideoEffect(videoClip)
 		# re-create the video
 		videoClips = mpe.concatenate_videoclips([videoClips.subclip(t_start=videoClips.start, t_end=randomStart), modifiedClip, videoClips.subclip(t_start=randomEnd, t_end=videoClips.end)], method="compose")
 
-
 		count += 1
-	videoClips.write_videofile("videoMashed" + str(index) + ".mp4", threads=100)
-	# videoClips.close()gi
+	return videoClips
+
+def getAudioClip():
+	audioArray = os.listdir(AUDIO_PATH)
+	audioIndex = random.randint(0, len(audioArray) - 1)
+	pathToAudio = str(AUDIO_PATH) + '/' + str(audioArray[audioIndex])
+	return mpe.AudioFileClip(pathToAudio)
 
 
-count=0
-createRandomVideo(1, count)
+def applyAudioEffect(videoClip):
+	audioClip = getAudioClip().subclip(t_start=videoClip.start, t_end=videoClip.end)
+	print(dir(audioClip))
+	AUDIO_EFFECTS_USED.append(audioClip.filename)
+	return videoClip.set_audio(audioClip)
+
+
+
+def addAudioEffects(videoClips, index, numOfEffects):
+	count = 0
+	while count != numOfEffects:
+		# grab part of video
+		randomStart = random.randint(0, int(videoClips.end))
+		randomEnd = random.randint(randomStart, int(videoClips.end))
+		videoClip = videoClips.subclip(t_start=randomStart, t_end=randomEnd)
+		# apply effect to video
+		modifiedClip = applyAudioEffect(videoClip)
+		# re-create the video
+		videoClips = mpe.concatenate_videoclips([videoClips.subclip(t_start=videoClips.start, t_end=randomStart), modifiedClip, videoClips.subclip(t_start=randomEnd, t_end=videoClips.end)], method="compose")
+		count += 1
+
+	return videoClips
+
+
+def createRandomVideo(amountOfClips, index):
+	count = 0
+	videos = []
+	while count != amountOfClips:
+		videos.append(getVideoFromClip(VIDEO_PATH))
+		count += 1
+	# Splice clips together
+	videoClips = mpe.concatenate_videoclips(videos, method="compose")
+	videoClips.write_videofile("videoMash" + str(index) + ".mp4", threads=100)
+
+	# audio effects should rarely be added
+	checkAddAudioEffects = getRandomNumber(10)
+	if (checkAddAudioEffects > 8):
+		numOfAudioEffects = videoClips.end // 5
+		if (numOfAudioEffects == 0):
+			numOfAudioEffects = 1
+		videoClips = addAudioEffects(videoClips, index, numOfAudioEffects)
+	numOfVideoEffects = videoClips.end // 3
+	videoClips = addVideoEffects(videoClips, index, numOfVideoEffects)
+	# Write video
+	
+	return videoClips.write_videofile("videoMashed" + str(index) + ".mp4", threads=1000)
+
+VIDEO_EFFECTS = [
+			speedEffectGenerate, playBackwardsEffect, flipClipHorizontallyEffect,
+			flipClipVerticallyEffect,blackAndWhiteEffect, 
+			# contrastLuminosityGenerate,	gammaCorrectionGenerate, fadeInGenerate, fadeOutGenerate
+			deepFryEffect, 
+			loopClipEffect
+			]
+
+
+def postToTwitter(video):
+	pass
+
+VIDEO_EFFECTS_USED = []
+AUDIO_EFFECTS_USED = []
+count = 0
+video = createRandomVideo(3, count)
+print(VIDEO_EFFECTS_USED)
+print(AUDIO_EFFECTS_USED)
+video.close()
+
+# videoPath = Path("../Videos/")
+# video = getVideoFromClip(videoPath)
+# # video = loopClipEffect(video)
+# video = addAudioEffects(video, count)
+# video.write_videofile("test effect.mp4", threads=100)
+
 
