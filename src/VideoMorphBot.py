@@ -79,9 +79,16 @@ def fadeOutEffect(video, duration):
 	return vfx.fadeout(video, duration)
 
 def applyVideoEffect(video):
-	index = getRandomNumber(len(VIDEO_EFFECTS)-1)
-	VIDEO_EFFECTS_USED.append(VIDEO_EFFECTS[index].__name__)
-	return VIDEO_EFFECTS[index](video)
+	rarityOfEffect = getRandomNumber(10)
+	videoEffectToUse = ''
+	if (rarityOfEffect >= 9):
+		videoEffectToUse = RARE_VIDEO_EFFECTS[getRandomNumber(len(RARE_VIDEO_EFFECTS)-1)]
+	elif (rarityOfEffect >= 7):
+		videoEffectToUse = UNCOMMON_VIDEO_EFFECTS[getRandomNumber(len(UNCOMMON_VIDEO_EFFECTS)-1)]
+	else:
+		videoEffectToUse = COMMON_VIDEO_EFFECTS[getRandomNumber(len(COMMON_VIDEO_EFFECTS)-1)]
+	VIDEO_EFFECTS_USED.append(videoEffectToUse.__name__)
+	return videoEffectToUse(video)
 
 def getRandomNumber(num):
 	return random.randint(0, num)
@@ -174,25 +181,31 @@ def createRandomVideo(amountOfClips, index):
 	
 	return videoClips.write_videofile("videoMashed" + str(index) + ".mp4", threads=1000)
 
-VIDEO_EFFECTS = [
+ALL_VIDEO_EFFECTS = [
 			speedEffectGenerate, playBackwardsEffect, flipClipHorizontallyEffect,
 			flipClipVerticallyEffect,blackAndWhiteEffect, 
 			# contrastLuminosityGenerate,	gammaCorrectionGenerate, fadeInGenerate, fadeOutGenerate
-			deepFryEffect, 
-			loopClipEffect
+			deepFryEffect, loopClipEffect
 			]
 
+RARE_VIDEO_EFFECTS = [	deepFryEffect	]
+UNCOMMON_VIDEO_EFFECTS = [	loopClipEffect	]
+COMMON_VIDEO_EFFECTS = 	[	speedEffectGenerate, playBackwardsEffect, flipClipHorizontallyEffect,
+							flipClipVerticallyEffect,	blackAndWhiteEffect
+						]
 
 def postToTwitter(video):
 	pass
 
-VIDEO_EFFECTS_USED = []
-AUDIO_EFFECTS_USED = []
 count = 0
-video = createRandomVideo(3, count)
-print(VIDEO_EFFECTS_USED)
-print(AUDIO_EFFECTS_USED)
-video.close()
+while count != 10:
+	VIDEO_EFFECTS_USED = []
+	AUDIO_EFFECTS_USED = []
+
+	video = createRandomVideo(3, count)
+	print(VIDEO_EFFECTS_USED)
+	print(AUDIO_EFFECTS_USED)
+	count += 1
 
 # videoPath = Path("../Videos/")
 # video = getVideoFromClip(videoPath)
