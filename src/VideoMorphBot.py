@@ -3,10 +3,9 @@ import moviepy.video.fx.all as vfx
 from moviepy.editor import * 
 import os
 import random
-import datetime
 from pathlib import Path
-
-import time
+import tweepy as twp
+import json
 
 CURRENT_DIR = os.path.dirname(__file__)
 AUDIO_PATH = Path("../Audio/")
@@ -179,7 +178,9 @@ def createRandomVideo(amountOfClips, index):
 	videoClips = addVideoEffects(videoClips, index, numOfVideoEffects)
 	# Write video
 	
-	return videoClips.write_videofile("videoMashed" + str(index) + ".mp4", threads=1000)
+	videoName = "videoMashed" + str(index) + ".mp4"
+	videoClips.write_videofile(videoName, threads=1000)
+	return videoName
 
 ALL_VIDEO_EFFECTS = [
 			speedEffectGenerate, playBackwardsEffect, flipClipHorizontallyEffect,
@@ -194,18 +195,43 @@ COMMON_VIDEO_EFFECTS = 	[	speedEffectGenerate, playBackwardsEffect, flipClipHori
 							flipClipVerticallyEffect,	blackAndWhiteEffect
 						]
 
-def postToTwitter(video):
-	pass
+def postToTwitter(videoName):
+	with open('twitterConfig.json') as file_out:
+		file_data = json.load(file_out)
+	api = file_data
+	# set up OAuth handling
+	auth = twp.OAuthHandler(file_data['api_key'], file_data['api_key_secret'])
+	auth.set_access_token(file_data['access_token'], file_data['access_token_secret'])
+	api = twp.API(auth)
+
+	print('video name:', videoName)
+	print('finished trying')
+	filePath = os.path.join(VIDEO_PATH, videoName)
+	print('filePath:', filePath)
+	with open(filePath) as video_out:
+		videoFile = json.load(video_out)
+	video = videoFile
+	print('video:', video)
+	# upload media
+	# mediaID = api.media_upload(videoName, video)
+	# print('mediaID:', mediaID)
+	# post to twitter
+	# api.update_status(status="test")
+	print('tried oh no')
+	print()
+	return
+
 
 count = 0
-while count != 10:
-	VIDEO_EFFECTS_USED = []
-	AUDIO_EFFECTS_USED = []
+# while count != 10:
+VIDEO_EFFECTS_USED = []
+AUDIO_EFFECTS_USED = []
 
-	video = createRandomVideo(3, count)
-	print(VIDEO_EFFECTS_USED)
-	print(AUDIO_EFFECTS_USED)
-	count += 1
+videoName = createRandomVideo(1, count)
+print(VIDEO_EFFECTS_USED)
+print(AUDIO_EFFECTS_USED)
+postToTwitter(Path(videoName))
+	# count += 1
 
 # videoPath = Path("../Videos/")
 # video = getVideoFromClip(videoPath)
