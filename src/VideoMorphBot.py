@@ -30,7 +30,7 @@ def getVideoFromClip(videoPath):
 	video.close()
 
 	startVideo = random.randrange(videoStart, videoEnd)
-	videoLength = random.randrange(2, 8)
+	videoLength = random.randrange(2, 6)
 
 	return mpe.VideoFileClip(pathToVideo).subclip(t_start=startVideo, t_end=(startVideo + videoLength))
 
@@ -168,15 +168,15 @@ def createRandomVideo(amountOfClips, index):
 	videoClips.write_videofile("videoMash" + str(index) + ".mp4", threads=100)
 
 	# audio effects should rarely be added
-	checkAddAudioEffects = getRandomNumber(10)
-	if (checkAddAudioEffects > 8):
-		numOfAudioEffects = videoClips.end // 5
-		if (numOfAudioEffects == 0):
-			numOfAudioEffects = 1
-		videoClips = addAudioEffects(videoClips, index, numOfAudioEffects)
+	# checkAddAudioEffects = getRandomNumber(10)
+	# if (checkAddAudioEffects > 8):
+	# 	numOfAudioEffects = videoClips.end // 5
+	# 	if (numOfAudioEffects == 0):
+	# 		numOfAudioEffects = 1
+	# 	videoClips = addAudioEffects(videoClips, index, numOfAudioEffects)
+
 	numOfVideoEffects = videoClips.end // 3
 	videoClips = addVideoEffects(videoClips, index, numOfVideoEffects)
-	# Write video
 	
 	videoName = "videoMashed" + str(index) + ".mp4"
 	videoClips.write_videofile(videoName, threads=1000)
@@ -227,10 +227,10 @@ count = 0
 VIDEO_EFFECTS_USED = []
 AUDIO_EFFECTS_USED = []
 
-videoName = createRandomVideo(1, count)
+videoName = createRandomVideo(3, count)
 print(VIDEO_EFFECTS_USED)
 print(AUDIO_EFFECTS_USED)
-postToTwitter(Path(videoName))
+# postToTwitter(Path(videoName))
 	# count += 1
 
 # videoPath = Path("../Videos/")
