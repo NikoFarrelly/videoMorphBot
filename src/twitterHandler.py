@@ -23,7 +23,7 @@ oauth = OAuth1(
 	resource_owner_secret=file_data['access_token_secret']
 )
 
-video_filename = "videoMashed0.mp4"
+video_filename = "videoMashedCodeced.mp4"
 
 global media_id
 def update_status_with_video(tweet, video):
@@ -31,7 +31,7 @@ def update_status_with_video(tweet, video):
 	api = twitter_auth_setup()
 	finalise_upload(append_upload(init_upload(video)))
 	api.update_status(status=tweet, media_ids=[media_id])
-	print("posted the video")
+	print("Posted the video")
 
 def twitter_auth_setup():
 	api = config_data

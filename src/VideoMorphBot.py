@@ -91,17 +91,18 @@ def createRandomVideo(amountOfClips, index):
 	videoClips.write_videofile(videoName, threads=1000)
 	return videoClips
 
-def postToTwitter(tweet, video):
+def post_to_twitter(tweet, video):
 	update_status_with_video(tweet, video)
 
+def convert_video_codec():
+	os.system("ffmpeg -i videoMashed0.mp4 -c:a aac -y videoMashedCodeced.mp4")
+	print("Finished codec conversion")
 
 
-count = 0
-# while count != 10:
-video = createRandomVideo(1, count)
-tweet = "please work"
-
-postToTwitter(tweet,video)
+video = createRandomVideo(3, count)
+convert_video_codec()
+tweet = ""
+post_to_twitter(tweet,video)
 video.close()
 
 
