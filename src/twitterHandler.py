@@ -10,7 +10,6 @@ INSPIRED BY https://github.com/twitterdev/large-video-upload-python/blob/master/
 """
 
 MEDIA_ENDPOINT_URL = "https://upload.twitter.com/1.1/media/upload.json"
-POST_TWEET_URL = "https://api.twitter.com/1.1/statuses/update.json"
 
 with open('twitterConfig.json') as file_out:
 	file_data = json.load(file_out)
@@ -23,42 +22,38 @@ oauth = OAuth1(
 	resource_owner_secret=file_data['access_token_secret']
 )
 
-video_filename = "videoMashedCodeced.mp4"
-
 global media_id
-def update_status_with_video(tweet, video):
+def update_status_with_video(tweet, filename):
 	global media_id
 	api = twitter_auth_setup()
-	finalise_upload(append_upload(init_upload(video)))
+	finalise_upload(append_upload(init_upload(filename)))
 	api.update_status(status=tweet, media_ids=[media_id])
 	print("Posted the video")
 
 def twitter_auth_setup():
 	api = config_data
-	# set up OAuth handling
 	auth = twp.OAuthHandler(config_data['api_key'], config_data['api_key_secret'])
 	auth.set_access_token(config_data['access_token'], config_data['access_token_secret'])
 	api = twp.API(auth)
 	return api
 
-def init_upload(video):
+def init_upload(filename):
 	global media_id
 	request_data = {
 		'command': 'INIT',
 		'media_type': 'video/mp4',
-		'total_bytes': os.path.getsize(video_filename),
+		'total_bytes': os.path.getsize(filename),
 		'media_category': 'tweet_video'
 	}
  
 	req = requests.post(url=MEDIA_ENDPOINT_URL, data=request_data, auth=oauth)
 	media_id = req.json()['media_id']
-	return video
+	return filename
 
-def append_upload(video):
+def append_upload(filename):
 	global media_id
 	segment_id = 0
 	bytes_sent = 0
-	filename = video_filename
 	file = open(filename, 'rb')
 
 	while bytes_sent < os.path.getsize(filename):
@@ -81,10 +76,9 @@ def append_upload(video):
 
 		segment_id = segment_id + 1
 		bytes_sent = file.tell()
-	return video
+	return filename
 
-
-def finalise_upload(video):
+def finalise_upload(filename):
 	global media_id
 	request_data = {
 		'command': 'FINALIZE',
@@ -103,13 +97,4 @@ def finalise_upload(video):
 
 	check_after_secs = processing_info['check_after_secs']
 	time.sleep(check_after_secs)
-
-	request_params = {
-		'command': 'STATUS',
-		'media_id': media_id
-	}
-
-	req = requests.get(url=MEDIA_ENDPOINT_URL, params=request_params, auth=oauth)
-
-	processing_info = req.json().get('processing_info', None)
-	finalise_upload(video)
+	finalise_upload(filename)

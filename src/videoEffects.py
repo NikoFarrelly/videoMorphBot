@@ -3,72 +3,72 @@ import moviepy.video.fx.all as vfx
 from moviepy.editor import * 
 import random
 
-def applyVideoEffect(video):
-	rarityOfEffect = getRandomNumber(10)
+def apply_video_effect(video):
+	rarityOfEffect = get_random_number(10)
 	videoEffectToUse = ''
 	if (rarityOfEffect >= 9):
-		videoEffectToUse = RARE_VIDEO_EFFECTS[getRandomNumber(len(RARE_VIDEO_EFFECTS)-1)]
+		videoEffectToUse = RARE_VIDEO_EFFECTS[get_random_number(len(RARE_VIDEO_EFFECTS)-1)]
 	elif (rarityOfEffect >= 7):
-		videoEffectToUse = UNCOMMON_VIDEO_EFFECTS[getRandomNumber(len(UNCOMMON_VIDEO_EFFECTS)-1)]
+		videoEffectToUse = UNCOMMON_VIDEO_EFFECTS[get_random_number(len(UNCOMMON_VIDEO_EFFECTS)-1)]
 	else:
-		videoEffectToUse = COMMON_VIDEO_EFFECTS[getRandomNumber(len(COMMON_VIDEO_EFFECTS)-1)]
+		videoEffectToUse = COMMON_VIDEO_EFFECTS[get_random_number(len(COMMON_VIDEO_EFFECTS)-1)]
 	return videoEffectToUse(video)
 
 # Utility
-def getRandomNumber(num):
+def get_random_number(num):
 	return random.randint(0, num)
 
 # Generation
-def fadeInGenerate(video):
-	return fadeInEffect(video, random.randint(1, 2))
+def fade_in_generate(video):
+	return fade_in_effect(video, random.randint(1, 2))
 
-def speedEffectGenerate(video):
-	return speedEffect(video, random.uniform(0.4, 1.3))
+def speed_effect_generate(video):
+	return speed_effect(video, random.uniform(0.4, 1.3))
 
-def contrastLuminosityGenerate(video):
-	return contrastLuminosityEffect(video, getRandomNumber(200), getRandomNumber(30))
+def contrast_luminosity_generate(video):
+	return contrast_luminosity_effect(video, get_random_number(200), get_random_number(30))
 
-def gammaCorrectionGenerate(video):
-	return gammaCorrectionEffect(video, random.randint(1, 6))
+def gamma_correction_generate(video):
+	return gamma_correction_effect(video, random.randint(1, 6))
 
-def fadeOutGenerate(video):
-	return fadeOutEffect(video, random.randint(1, 2))
+def fade_out_generate(video):
+	return fade_out_effect(video, random.randint(1, 2))
 
-def fadeInGenerate(video):
-	return fadeInEffect(video, random.randint(1, 2))
+def fade_in_generate(video):
+	return fade_in_effect(video, random.randint(1, 2))
 
 # Effects
-def speedEffect(video, speed):
+def speed_effect(video, speed):
 	return video.fx(vfx.speedx, speed)
 
-def playBackwardsEffect(video):
+def play_backwards_effect(video):
 	return video.fx(vfx.time_mirror)
 
-def flipClipHorizontallyEffect(video):
+def flip_clip_horizontally_effect(video):
 	return vfx.mirror_x(video)
 
-def flipClipVerticallyEffect(video):
+def flip_clip_vertically_effect(video):
 	return vfx.mirror_y(video)
 
-def blackAndWhiteEffect(video):
+def black_and_white_effect(video):
 	return vfx.blackwhite(video)
 
-def contrastLuminosityEffect(video, luminosity, contrast):
+def contrast_luminosity_effect(video, luminosity, contrast):
 	return vfx.lum_contrast(video, luminosity, contrast)
 
-def gammaCorrectionEffect(video, correction):
+def gamma_correction_effect(video, correction):
 	return vfx.gamma_corr(video, correction)
 
-def fadeInEffect(video, duration):
+def fade_in_effect(video, duration):
 	return vfx.fadein(video, duration)
 
-def fadeOutEffect(video, duration):
+def fade_out_effect(video, duration):
 	return vfx.fadeout(video, duration)
 
-def deepFryEffect(video):
+def deep_fry_effect(video):
 	return vfx.lum_contrast(video.volumex(2000), 50, 10)
 
-def loopClipEffect(video):
+def loop_clip_effect(video):
 	videoLength = video.end
 	if (video.end == 0):
 		return video
@@ -84,15 +84,15 @@ def loopClipEffect(video):
 
 
 ALL_VIDEO_EFFECTS = [
-			speedEffectGenerate, playBackwardsEffect, flipClipHorizontallyEffect,
-			flipClipVerticallyEffect,blackAndWhiteEffect, 
-			# contrastLuminosityGenerate,	gammaCorrectionGenerate, fadeInGenerate, fadeOutGenerate
-			deepFryEffect, loopClipEffect
-			]
+			speed_effect_generate, play_backwards_effect, flip_clip_horizontally_effect,
+			flip_clip_vertically_effect,black_and_white_effect, 
+			# contrast_luminosity_generate,	gamma_correction_generate, fade_in_generate, fade_out_generate
+			deep_fry_effect, loop_clip_effect
+		]
 
-RARE_VIDEO_EFFECTS = [	deepFryEffect	]
-UNCOMMON_VIDEO_EFFECTS = [	loopClipEffect	]
+RARE_VIDEO_EFFECTS = [	deep_fry_effect	]
+UNCOMMON_VIDEO_EFFECTS = [	loop_clip_effect	]
 COMMON_VIDEO_EFFECTS = 	[	
-	speedEffectGenerate, playBackwardsEffect, flipClipHorizontallyEffect,
-	flipClipVerticallyEffect,	blackAndWhiteEffect
-	]
+	speed_effect_generate, play_backwards_effect, flip_clip_horizontally_effect,
+	flip_clip_vertically_effect,	black_and_white_effect
+]
