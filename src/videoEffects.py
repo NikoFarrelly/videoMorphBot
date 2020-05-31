@@ -4,11 +4,11 @@ from moviepy.editor import *
 import random
 
 def apply_video_effect(video):
-	rarityOfEffect = get_random_number(10)
+	rarityOfEffect = get_random_number(100)
 	videoEffectToUse = ''
-	if (rarityOfEffect >= 9):
+	if (rarityOfEffect >= 95):
 		videoEffectToUse = RARE_VIDEO_EFFECTS[get_random_number(len(RARE_VIDEO_EFFECTS)-1)]
-	elif (rarityOfEffect >= 7):
+	elif (rarityOfEffect >= 90):
 		videoEffectToUse = UNCOMMON_VIDEO_EFFECTS[get_random_number(len(UNCOMMON_VIDEO_EFFECTS)-1)]
 	else:
 		videoEffectToUse = COMMON_VIDEO_EFFECTS[get_random_number(len(COMMON_VIDEO_EFFECTS)-1)]

@@ -7,6 +7,7 @@ import moviepy.editor as mpe
 from twitterHandler import update_status_with_video
 
 REL_VIDEO_PATH = Path("../Videos/")
+OUTPUT_VIDEO_RESOLUTION = (1280,720)
 
 def get_video_from_clip(video_path):
 	video_array = os.listdir(video_path)
@@ -75,7 +76,7 @@ def create_random_video(num_clips_to_get):
 	count = 0
 	videos = []
 	while count != num_clips_to_get:
-		videos.append(get_video_from_clip(REL_VIDEO_PATH))
+		videos.append(get_video_from_clip(REL_VIDEO_PATH).resize(OUTPUT_VIDEO_RESOLUTION))
 		count += 1
 	video_clips = mpe.concatenate_videoclips(videos, method="compose")
 	video_clips.write_videofile("videoMash.mp4", threads=100, audio_codec="aac")
@@ -100,8 +101,6 @@ def post_to_twitter(tweet, filename):
 	update_status_with_video(tweet, filename)
 
 
-filename = create_random_video(1)
+filename = create_random_video(3)
 tweet = ""
 post_to_twitter(tweet, filename)
-
-
