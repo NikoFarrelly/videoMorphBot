@@ -4,7 +4,6 @@ from moviepy.editor import *
 import random
 from videoRetrieval import get_video_from_clip
 from PIL import Image, ImageFont, ImageDraw, ImageEnhance
-from pathlib import Path
 
 def apply_video_effect(video):
 	rarityOfEffect = get_random_number(100)
@@ -86,7 +85,7 @@ def zoom(video, x1, y1, x2, y2):
     return vfx.crop(video, x1=x1, y1=y1, x2=x2, y2=y2).resize(video.size)
 
 def be_right_back_effect(video):
-	meme_length = 2 # what has my life come to
+	meme_length = 3 # what has my life come to
 	start_effect_at = video.end - meme_length if video.end - meme_length >= 0 else 1
 	text = "We'll be right back"
 	filename = "be_right_back_effect.png"
@@ -96,7 +95,7 @@ def be_right_back_effect(video):
 	text_clip = add_text_to_image((175,video.h/2 - 60), filename, text).set_duration(meme_length)
 	concatenated_clips = mpe.concatenate_videoclips([text_clip], method="compose")
 
-	audio_clip = mpe.AudioFileClip(Path("../Audio/We'll be right back Sound Effect meme.mp3"))
+	audio_clip = mpe.AudioFileClip("../Audio/We'll be right back Sound Effect meme.mp3")
 	clip_with_audio = concatenated_clips.subclip(t_start=0, t_end=meme_length).set_audio(audio_clip)
 
 	re_concatenation = mpe.concatenate_videoclips([pre_effect_clip, clip_with_audio], method="compose")
@@ -106,7 +105,7 @@ def add_text_to_image(coords, image_filename, text):
 	image_file = Image.open(image_filename)
 	draw = ImageDraw.Draw(image_file)
 	font = ImageFont.truetype("impact.ttf", 120)
-	draw.text(coords, text, (255, 255, 255, 100), font=font)
+	draw.text(coords, text, (255, 255, 255), font=font)
 	image_file.save(image_filename)
 	return mpe.ImageClip(image_filename)
 
