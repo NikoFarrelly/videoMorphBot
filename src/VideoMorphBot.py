@@ -5,7 +5,6 @@ from videoEffects import apply_video_effect
 import moviepy.editor as mpe 
 from twitterHandler import update_status_with_video
 from videoRetrieval import get_video_from_clip 
-from moviepy.video.tools.subtitles import SubtitlesClip
 
 OUTPUT_VIDEO_RESOLUTION = (1280,720)
 
@@ -19,7 +18,8 @@ def add_video_effects(video_clips, num_of_vfx):
 
 		video_clip = video_clips.subclip(t_start=random_start, t_end=random_end)
 		# apply effect to video
-		modified_clip = apply_video_effect(video_clip)
+		modified_clip = apply_video_effect(video_clip, all_effects=True)
+
 		# re-create the video
 		video_clips = mpe.concatenate_videoclips(
 			[
@@ -66,7 +66,7 @@ def create_random_video(num_clips_to_get):
 	# 		numOfAudioEffects = 1
 	# 	videoClips = add_audio_effects(videoClips, index, numOfAudioEffects)
 
-	num_of_vfx = video_clips.end // 3
+	num_of_vfx = video_clips.end // 2
 	video = add_video_effects(video_clips, num_of_vfx)
 	
 	video_name = "videoMashed.mp4"

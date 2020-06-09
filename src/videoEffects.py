@@ -5,16 +5,22 @@ import random
 from videoRetrieval import get_video_from_clip
 from PIL import Image, ImageFont, ImageDraw, ImageEnhance
 
-def apply_video_effect(video):
-	rarityOfEffect = get_random_number(100)
-	videoEffectToUse = ''
-	if (rarityOfEffect >= 95):
-		videoEffectToUse = RARE_VIDEO_EFFECTS[get_random_number(len(RARE_VIDEO_EFFECTS)-1)]
-	elif (rarityOfEffect >= 90):
-		videoEffectToUse = UNCOMMON_VIDEO_EFFECTS[get_random_number(len(UNCOMMON_VIDEO_EFFECTS)-1)]
+OUTPUT_VIDEO_RESOLUTION = (1280,720)
+
+def apply_video_effect(video, all_effects=False):
+
+	if (all_effects):
+		return ALL_VIDEO_EFFECTS[get_random_number(len(ALL_VIDEO_EFFECTS)-1)](video)
 	else:
-		videoEffectToUse = COMMON_VIDEO_EFFECTS[get_random_number(len(COMMON_VIDEO_EFFECTS)-1)]
-	return videoEffectToUse(video)
+		rarityOfEffect = get_random_number(100)
+		videoEffectToUse = ''
+		if (rarityOfEffect >= 95):
+			videoEffectToUse = RARE_VIDEO_EFFECTS[get_random_number(len(RARE_VIDEO_EFFECTS)-1)]
+		elif (rarityOfEffect >= 70):
+			videoEffectToUse = UNCOMMON_VIDEO_EFFECTS[get_random_number(len(UNCOMMON_VIDEO_EFFECTS)-1)]
+		else:
+			videoEffectToUse = COMMON_VIDEO_EFFECTS[get_random_number(len(COMMON_VIDEO_EFFECTS)-1)]
+		return videoEffectToUse(video)
 
 # Utility
 def get_random_number(num):
@@ -74,7 +80,10 @@ def repeat_sample_effect(video):
 	return vfx.supersample(video, video.end, random.randint(5,20))
 
 def two_clips_at_once_effect(video):
-	return vfx.mask_or(video, get_video_from_clip())
+	randomClip = get_video_from_clip()
+	if (randomClip.size != OUTPUT_VIDEO_RESOLUTION):
+		randomClip = randomClip.resize(OUTPUT_VIDEO_RESOLUTION)
+	return vfx.mask_or(video, randomClip)
 
 def zoom_center_effect(video):
 	focused_height = video.h // 3
@@ -87,6 +96,8 @@ def zoom(video, x1, y1, x2, y2):
 def be_right_back_effect(video):
 	meme_length = 3 # what has my life come to
 	start_effect_at = video.end - meme_length if video.end - meme_length >= 0 else 1
+	if (video.end == 0):
+		start_effect_at = video.end
 	text = "We'll be right back"
 	filename = "be_right_back_effect.png"
 	pre_effect_clip = video.subclip(t_start=0, t_end=start_effect_at)
@@ -149,13 +160,14 @@ def loop_clip_effect(video):
 ALL_VIDEO_EFFECTS = [
 			speed_effect_generate, play_backwards_effect, flip_clip_horizontally_effect,
 			flip_clip_vertically_effect,black_and_white_effect, 
-			# contrast_luminosity_generate,	gamma_correction_generate, fade_in_generate, fade_out_generate
-			deep_fry_effect, loop_clip_effect
+			contrast_luminosity_generate,	gamma_correction_generate, fade_in_generate, fade_out_generate,
+			deep_fry_effect, loop_clip_effect, zoom_center_effect, be_right_back_effect, repeat_sample_effect,
+			two_clips_at_once_effect
 		]
 
 RARE_VIDEO_EFFECTS = [	deep_fry_effect, zoom_center_effect, be_right_back_effect	]
-UNCOMMON_VIDEO_EFFECTS = [	loop_clip_effect, repeat_sample_effect, two_clips_at_once_effect	]
+UNCOMMON_VIDEO_EFFECTS = [	loop_clip_effect, repeat_sample_effect, two_clips_at_once_effect,flip_clip_vertically_effect	]
 COMMON_VIDEO_EFFECTS = 	[	
 	speed_effect_generate, play_backwards_effect, flip_clip_horizontally_effect,
-	flip_clip_vertically_effect,	black_and_white_effect
+	black_and_white_effect,
 ]
